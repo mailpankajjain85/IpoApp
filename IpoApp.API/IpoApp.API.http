@@ -1,0 +1,6 @@
+@IpoApp.API_HostAddress = http://localhost:5115
+
+GET {{IpoApp.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

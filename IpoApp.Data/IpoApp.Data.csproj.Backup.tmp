@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+<ItemGroup>
+  <None Remove="Migrations\Scripts\0003_CreateUser.sql" />
+</ItemGroup>
+
+
+<ItemGroup>
+  <EmbeddedResource Include="Migrations\Scripts\0000_CreateMigrationTable.sql" />
+  <EmbeddedResource Include="Migrations\Scripts\0001_CreateTables.sql" />
+  <EmbeddedResource Include="Migrations\Scripts\0002_SeedData.sql" />
+  <EmbeddedResource Include="Migrations\Scripts\0003_CreateUser.sql" />
+  <!-- Add other scripts here -->
+</ItemGroup>
+<ItemGroup>
+  <PackageReference Include="Dapper" Version="2.1.66" />
+  <PackageReference Include="Npgsql" Version="9.0.3" />
+</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

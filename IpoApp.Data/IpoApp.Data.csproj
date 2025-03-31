@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+<ItemGroup>
+  <EmbeddedResource Include="Migrations\Scripts\0000_CreateMigrationTable.sql" />
+  <EmbeddedResource Include="Migrations\Scripts\0001_CreateTablesForTenantOrg.sql" />
+  <EmbeddedResource Include="Migrations\Scripts\0002_CreateUser.sql" />
+  <EmbeddedResource Include="Migrations\Scripts\0003_CreateIpoMaster.sql" />
+  <EmbeddedResource Include="Migrations\Scripts\0004_CreateTransactionTable.sql" />
+  <!-- Add other scripts here -->
+</ItemGroup>
+<ItemGroup>
+  <PackageReference Include="Dapper" Version="2.1.66" />
+  <PackageReference Include="Npgsql" Version="9.0.3" />
+</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
