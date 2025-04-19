@@ -41,43 +41,34 @@ namespace IpoApp.API.Controllers
             }
         }
 
+        [HttpGet("validate-token")]
+        [Authorize] // Requires valid token
+        public IActionResult ValidateToken()
+        {
+            // Extract claims from the validated token
+            var userClaims = HttpContext.User.Claims;
 
-        //[HttpPost("login")]
-        //public IActionResult Login(string userName, string password, string orgShortCode)
-        //{
-        //    if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
-        //    {
-        //        return BadRequest("Username and password are required.");
-        //    }
-        //    // Authenticate the user using the UserService
-        //    var authenticatedUser = _userService.Authenticate(userName, password, orgShortCode);
-        //    if (authenticatedUser == null)
-        //    {
-        //        return Unauthorized("Invalid username or password.");
-        //    }
+            // Create response object
+            var response = new
+            {
+                IsValid = true,
+                UserDetails = new
+                {
+                    UserId = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Username = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
+                    Email = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
+                    Role = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value,
+                    OrgShortCode = userClaims.FirstOrDefault(c => c.Type == "OrgShortCode")?.Value,
+                    TokenIssuedAt = DateTimeOffset.FromUnixTimeSeconds(
+                        long.Parse(userClaims.FirstOrDefault(c => c.Type == "iat")?.Value)).DateTime,
+                    TokenExpiresAt = DateTimeOffset.FromUnixTimeSeconds(
+                        long.Parse(userClaims.FirstOrDefault(c => c.Type == "exp")?.Value)).DateTime
+                }
+            };
 
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]); // Replace with your actual secret key
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new[]
-        //        {
-        //            new Claim(ClaimTypes.Name, authenticatedUser.Name),
-        //            new Claim(ClaimTypes.Email, authenticatedUser.Email),
-        //            new Claim("OrgShortCode", authenticatedUser.OrgShortCode),
-        //            new Claim(ClaimTypes.MobilePhone, authenticatedUser.Phone), // Use UserId or another unique identifier
-        //            new Claim("UserId", authenticatedUser.UserName),
-        //            new Claim("Role", authenticatedUser.UserRole.ToString())
-        //        }),
-        //        Expires = DateTime.UtcNow.AddHours(1),
-        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        //    };
-        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-        //    var tokenString = tokenHandler.WriteToken(token);
-        //    // Return the token along with user information 
+            return Ok(response);
+        }
 
-        //    return Ok(tokenString);
-        //}
 
     }
 }

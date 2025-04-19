@@ -44,6 +44,16 @@ public class UserCreateRequest
     public string Role { get; set; }
 }
 
+public class UserUpdateRequest
+{
+    [EmailAddress]
+    public string Email { get; set; }
+
+    public bool IsActive { get; set; }
+
+    [RegularExpression("^(ADMIN|STAFF|CLIENT)$")]
+    public string? Role { get; set; } // Nullable - only admins can change
+}
 // DTOs/User/UserResponse.cs
 public class UserResponse
 {

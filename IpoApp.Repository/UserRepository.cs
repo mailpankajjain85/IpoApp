@@ -10,11 +10,13 @@ namespace IpoApp.Repository
 {
     public interface IUserRepository
     {
-        Task<User> GetByIdAsync(Guid id);
+        Task<User> GetByIdAsync(Guid id, string orgShortCode);
         Task<User> GetByUsernameAsync(string username, string orgShortCode);
         Task CreateAsync(User user);
-        Task UpdateAsync(User user);
         Task<bool> UsernameExistsAsync(string username);
+        Task<IEnumerable<User>> GetByOrgAsync(string orgShortCode);
+        Task DeleteAsync(Guid id, string orgShortCode);
+        Task UpdateAsync(User user);
     }
 
     public class UserRepository : IUserRepository
@@ -35,12 +37,12 @@ namespace IpoApp.Repository
         }
 
         // Other implementations...
-        public async Task<User> GetByIdAsync(Guid id)
+        public async Task<User> GetByIdAsync(Guid id, string orgShortCode)
         {
-            const string sql = @"SELECT * FROM UserMaster WHERE UserID = @UserID";
+            const string sql = @"SELECT * FROM UserMaster WHERE UserID = @UserID and OrgShortCode = @OrgShortCode";
             using (var conn = _context.CreateConnection())
             {
-                return await conn.QuerySingleOrDefaultAsync<User>(sql, new { UserID = id });
+                return await conn.QuerySingleOrDefaultAsync<User>(sql, new { UserID = id, OrgShortCode = orgShortCode });
             }
         }
         public async Task<User> GetByUsernameAsync(string username, string orgShortCode)
@@ -53,7 +55,15 @@ namespace IpoApp.Repository
         }
         public async Task UpdateAsync(User user)
         {
-            const string sql = @"UPDATE UserMaster SET ... WHERE UserID = @UserID";
+            const string sql = @"
+            UPDATE UserMaster 
+            SET Email = @Email, 
+                IsActive = @IsActive,
+                Role = @Role,
+                UpdatedAt = @UpdatedAt
+            WHERE UserID = @UserID";
+
+            user.UpdatedAt = DateTime.UtcNow;
             using (var conn = _context.CreateConnection())
             {
                 await conn.ExecuteAsync(sql, user);
@@ -68,5 +78,24 @@ namespace IpoApp.Repository
                 return count > 0;
             }
         }
+
+        public async Task<IEnumerable<User>> GetByOrgAsync(string orgShortCode)
+        {
+            const string sql = @"SELECT * FROM UserMaster WHERE OrgShortCode = @OrgShortCode";
+            using (var conn = _context.CreateConnection())
+            {
+                return await conn.QueryAsync<User>(sql, new { OrgShortCode = orgShortCode });
+            }
+        }
+        public async Task DeleteAsync(Guid id, string orgShortCode)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                await connection.ExecuteAsync("Update UserMaster Set isactive = 0 WHERE userid = @Id and OrgShortCode = @OrgShortCode", new { Id = id, OrgShortCode = orgShortCode });
+            }
+        }
+
+
+
     }
 }

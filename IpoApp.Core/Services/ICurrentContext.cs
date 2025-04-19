@@ -14,6 +14,9 @@ namespace IpoApp.Core.Services
         string OrgShortCode { get; }
         string Role { get; }
         string Username { get; }
+        bool IsInRole(string role);
+        bool IsAdmin { get; }
+        string ClientShortCode { get;}
     }
 
     // Services/CurrentContext.cs
@@ -37,7 +40,19 @@ namespace IpoApp.Core.Services
         public string Username =>
             _httpContextAccessor.HttpContext?.User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        public bool IsInRole(string role)
+        {
+            return _httpContextAccessor.HttpContext?
+                .User?
+                .IsInRole(role) ?? false;
+        }
 
-  
+        public bool IsAdmin => IsInRole("ADMIN");
+        public string ClientShortCode =>
+            _httpContextAccessor.HttpContext?.User.Claims
+                .FirstOrDefault(c => c.Type == "ClientShortCode")?.Value;
+
     }
+
+
 }

@@ -1,4 +1,5 @@
 ﻿using IpoApp.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IpoApp.API.Controller
@@ -30,6 +31,49 @@ namespace IpoApp.API.Controller
         {
             var client = await _service.GetUserAsync(id);
             return client != null ? Ok(client) : NotFound();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetAll()
+        {
+            var users = await _service.GetAllUsersAsync();
+            return Ok(users);
+        }
+
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UserUpdateRequest request)
+        {
+            try
+            {
+                await _service.UpdateUserAsync(userId, request);
+                return NoContent();
+            }
+            catch (Exception ex) when (ex is KeyNotFoundException or UnauthorizedAccessException)
+            {
+                return Problem(
+                    title: ex.GetType().Name,
+                    detail: ex.Message,
+                    statusCode: ex is KeyNotFoundException ? 404 : 403);
+            }
+        }
+
+        [HttpDelete("{userId}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
+        {
+            try
+            {
+                await _service.DeleteUserAsync(userId);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Problem(
+                    title: "Forbidden",
+                    detail: ex.Message,
+                    statusCode: 403);
+            }
         }
     }
 }
