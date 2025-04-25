@@ -125,24 +125,23 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(80); // HTTP only
-});
+
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "IPO API V1");
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "IPO API V1");
+    });
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.MapControllers();
 
