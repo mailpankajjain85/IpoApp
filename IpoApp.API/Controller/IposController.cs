@@ -47,6 +47,7 @@ namespace IpoApp.API.Controllers
         {
             var ipos = await _ipoService.GetIposByOrgAsync();
             return Ok(ipos);
+
         }
     }
 }
